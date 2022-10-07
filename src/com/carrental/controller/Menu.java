@@ -1,6 +1,8 @@
 package com.carrental.controller;
 
+import com.carrental.builders.CarBuilder;
 import com.carrental.carRepository.Car;
+import com.carrental.carRepository.CarType;
 import com.carrental.customerDataBase.Customer;
 import com.carrental.prepareData.PrepareData;
 
@@ -18,12 +20,12 @@ public class Menu {
 
 
     public void currentStatus(){
-        System.out.println("number of cars: " + pd.getCars().size());
-        System.out.println("number of customers: " + pd.getCustomers().size());
+        System.out.println("Total number of cars: " + pd.getCars().size());
+        System.out.println("Number of customers: " + pd.getCustomers().size());
         carsAvailableToRent = pd.getCars().stream().filter(car -> !car.isRented()).toList();
         carsRented = pd.getCars().stream().filter(Car::isRented).toList();
-        System.out.println("number of cars available: " + carsAvailableToRent.size());
-        System.out.println("number of cars rented: " + carsRented.size());
+        System.out.println("Number of cars available: " + carsAvailableToRent.size());
+        System.out.println("Number of cars rented: " + carsRented.size());
         System.out.println("Cars available: " + carsAvailableToRent);
         System.out.println("Cars rented: " + carsRented);
     }
@@ -91,19 +93,11 @@ public class Menu {
     }
 
     private boolean checkIfUserIDisValid(int id) {
-        if(id>0 && id <= pd.getCustomers().size()){
-            return true;
-        } else {
-            return false;
-        }
+        return id > 0 && id <= pd.getCustomers().size();
     }
 
     private boolean checkIfCarIDisValid(int id) {
-        if(id>0 && id <= pd.getCars().size()){
-            return true;
-        } else {
-            return false;
-        }
+        return id > 0 && id <= pd.getCars().size();
     }
 
     private void updateRentedCar(int userId, int carId) {
@@ -114,7 +108,7 @@ public class Menu {
 
     private void updateRentingCustomer(int userId, int carId) {
         pd.getCustomers().get(userId - 1).increaseNumberOfRentals(1);
-        pd.getCustomers().get(userId - 1).increaseMoneySpent(pd.getCars().get(carId - 1).getPricePerDay());
+        pd.getCustomers().get(userId - 1).increaseMoneySpent(pd.getCars().get(carId - 1).getPrice());
         pd.getCustomers().get(userId - 1).addCarToCurrentlyRented(pd.getCars().get(carId -1));
     }
 
@@ -131,7 +125,7 @@ public class Menu {
             for(Car car: pd.getCars()){
                 i++;
                 if(!car.isRented()){
-                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPricePerDay() + " available: " + !car.isRented());
+                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPrice() + " available: " + !car.isRented());
                 }
             }
             try {
@@ -155,11 +149,11 @@ public class Menu {
         int i = 0;
         int result = 0;
         if(checkIfThereAreCarsToReturn(pd.getCars())){
-            System.out.println("Pick your car: ");
+            System.out.println("Pick the car you want to return: ");
             for(Car car: pd.getCars()){
                 i++;
                 if(car.isRented()){
-                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPricePerDay() + " available: " + !car.isRented());
+                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPrice() + " available: " + !car.isRented());
                 }
             }
             try {
@@ -212,5 +206,59 @@ public class Menu {
             if (c.isRented()) return true;
         }
         return false;
+    }
+
+    public void addNewCar() {
+        System.out.println("Enter model name: ");
+
+        String modelName = scanner.nextLine();
+        System.out.println("Select type: ");
+        System.out.println("[S]EDAN, [V]AN, S[U]V, [H]ATCHBACK, [C]ONVERTIBLE, C[O]UPE, S[T]ATION_WAGON, S[P]ORTS_CAR");
+        CarType type;
+        switch(scanner.nextLine().toUpperCase()) {
+            case "S" -> type = CarType.SEDAN;
+            case "V" -> type = CarType.VAN;
+            case "U" -> type = CarType.SUV;
+            case "H" -> type = CarType.HATCHBACK;
+            case "C" -> type = CarType.CONVERTIBLE;
+            case "O" -> type = CarType.COUPE;
+            case "T" -> type = CarType.STATION_WAGON;
+            case "P" -> type = CarType.SPORTS_CAR;
+            default -> {
+                System.out.println("Invalid choice. Setting to default (SEDAN).");
+                type = CarType.SEDAN;
+            }
+        }
+        int mileage = 0;
+        boolean isCarDataValid = true;
+        System.out.println("Enter mileage: ");
+        try {
+            mileage = scanner.nextInt();
+        } catch (Exception e){
+            isCarDataValid = false;
+        }
+        double price = 0;
+        System.out.println("Enter price: ");
+        try {
+            price = scanner.nextDouble();
+            scanner.nextLine(); // to consume the last \n that scanner.nextDouble/Int has left in the input buffer
+        } catch (Exception e){
+            isCarDataValid = false;
+        }
+        if (isCarDataValid) {
+            var car = new CarBuilder().withModel(modelName).withType(type).withMileage(mileage).withPrice(price).build();
+            System.out.println("Is this data correct? [Y] - add to the list / [N] - discard \n" + car);
+            switch(scanner.nextLine().toUpperCase()) {
+                case "Y" -> {
+                    pd.getCars().add(car);
+                    System.out.println("New car added.");
+                }
+                case "N" -> System.out.println("New car wasn't added.");
+                default -> System.out.println("Invalid selection, car wasn't added.");
+            }
+        } else {
+            System.out.println("Car data invalid, car creation cancelled.");
+        }
+
     }
 }

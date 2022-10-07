@@ -12,13 +12,14 @@ public class Main {
         while (true){
 
             System.out.println("Welcome to Car Rental, please make your choice: ");
-            System.out.println("1. Display stats");
-            System.out.println("2. Display available cars");
-            System.out.println("3. Display customers info");
-            System.out.println("4. Add a new customer");
-            System.out.println("5. Rent a car");
-            System.out.println("6. Return a car");
-            System.out.println("Q. Exit");
+            System.out.println("[1]. Display stats");
+            System.out.println("[2]. Display available cars");
+            System.out.println("[3]. Display customers info");
+            System.out.println("[4]. Add new customer");
+            System.out.println("[5]. Rent a car");
+            System.out.println("[6]. Return a car");
+            System.out.println("[7]. Add a new car");
+            System.out.println("[Q]. Exit");
             Scanner scanner = new Scanner(System.in);
 
             userInput = scanner.nextLine().toLowerCase();
@@ -35,6 +36,8 @@ public class Main {
                 case "5": menu.rentCar();
                     break;
                 case "6": menu.returnCar();
+                    break;
+                case "7": menu.addNewCar();
                     break;
                 case "q": System.exit(0);
                     break;

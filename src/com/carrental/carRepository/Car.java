@@ -14,17 +14,17 @@ public class Car {
     private boolean isRented = false;
 
 
-    private double pricePerDay;
+    private double price;
 
     public Car() {
     }
 
-    public Car(String model, CarType type, int mileage, Customer rentedBy, double pricePerDay) {
+    public Car(String model, CarType type, int mileage, Customer rentedBy, double price) {
         this.model = model;
         this.type = type;
         this.mileage = mileage;
         this.rentedBy = rentedBy;
-        this.pricePerDay = pricePerDay;
+        this.price = price;
     }
 
     public String getModel() {
@@ -59,12 +59,12 @@ public class Car {
         this.rentedBy = rentedBy;
     }
 
-    public double getPricePerDay() {
-        return pricePerDay;
+    public double getPrice() {
+        return price;
     }
 
-    public void setPricePerDay(double pricePerDay) {
-        this.pricePerDay = pricePerDay;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public boolean isRented() {
@@ -84,7 +84,7 @@ public class Car {
                 ", type=" + type +
                 ", mileage=" + mileage +
                 ", rentedBy=" + rentedBy +
-                ", pricePerDay=" + pricePerDay +
+                ", pricePerDay=" + price +
                 ", isRented=" + isRented +
                 '}' + '\n';
     }
@@ -94,11 +94,11 @@ public class Car {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Car car = (Car) o;
-        return mileage == car.mileage && Double.compare(car.pricePerDay, pricePerDay) == 0 && model.equals(car.model) && type == car.type && Objects.equals(rentedBy, car.rentedBy);
+        return mileage == car.mileage && Double.compare(car.price, price) == 0 && model.equals(car.model) && type == car.type && Objects.equals(rentedBy, car.rentedBy);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(model, type, mileage, rentedBy, pricePerDay);
+        return Objects.hash(model, type, mileage, rentedBy, price);
     }
 }
