@@ -2,16 +2,16 @@ package com.carrental.customerDataBase;
 
 import com.carrental.carRepository.Car;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Customer {
 
-    String name;
-    String surName;
-    int numberOfRentals = 0;
-    double moneySpent = 0.0;
-
-    List<Car> carsRentedCurrently;
+    private String name;
+    private String surName;
+    private int numberOfRentals = 0;
+    private double moneySpent = 0.0;
+    private List<Car> carsRentedHistory = new ArrayList<>();
 
     public Customer(String name, String surName) {
         this.name = name;
@@ -50,16 +50,12 @@ public class Customer {
         if (amount>0) this.moneySpent += amount;
     }
 
-    public List<Car> getCarsRentedCurrently() {
-        return carsRentedCurrently;
+    public List<Car> getCarsRentedHistory() {
+        return carsRentedHistory;
     }
 
     public void addCarToCurrentlyRented(Car car) {
-        this.carsRentedCurrently.add(car);
-    }
-
-    public void removeCarFromCurrentlyRented(Car car) {
-        this.carsRentedCurrently.remove(car);
+        this.carsRentedHistory.add(car);
     }
 
     @Override
@@ -69,6 +65,6 @@ public class Customer {
                 ", surName='" + surName + '\'' +
                 ", numberOfRentals=" + numberOfRentals +
                 ", moneySpent=" + moneySpent +
-                '}';
+                '}' + '\n';
     }
 }

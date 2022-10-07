@@ -7,46 +7,41 @@ public class Main {
 
         Menu menu = new Menu();
         menu.initialize();
-        int userInput=0;
+        String userInput;
 
         while (true){
 
             System.out.println("Welcome to Car Rental, please make your choice: ");
-            System.out.println("1. Not implemented");
+            System.out.println("1. Display stats");
             System.out.println("2. Display available cars");
             System.out.println("3. Display customers info");
-            System.out.println("4. Enter customer info");
+            System.out.println("4. Add a new customer");
             System.out.println("5. Rent a car");
-            System.out.println("6. Exit");
+            System.out.println("6. Return a car");
+            System.out.println("Q. Exit");
             Scanner scanner = new Scanner(System.in);
-            try {
-                userInput = scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("You didn't enetered a valid digit!");
-            }
 
+            userInput = scanner.nextLine().toLowerCase();
 
             switch(userInput) {
-                case 1: menu.displayBranches();
+                case "1": menu.currentStatus();
                     break;
-                case 2: menu.displayCars();
+                case "2": menu.displayCars();
                     break;
-                case 3: menu.displayCustomers();
+                case "3": menu.displayCustomers();
                     break;
-                case 4: menu.addCustomer();
+                case "4": menu.addCustomer();
                     break;
-                case 5: menu.rent();
+                case "5": menu.rentCar();
                     break;
-                case 6: System.exit(0);
+                case "6": menu.returnCar();
+                    break;
+                case "q": System.exit(0);
                     break;
                 default:
                     System.out.println("You didn't enetered a valid digit!");
 
-
             }
-
         }
-
-
     }
 }

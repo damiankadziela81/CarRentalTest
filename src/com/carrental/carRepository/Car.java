@@ -2,12 +2,17 @@ package com.carrental.carRepository;
 
 import com.carrental.customerDataBase.Customer;
 
+import java.util.Objects;
+
 public class Car {
 
     private String model;
     private CarType type;
     private int mileage;
     private Customer rentedBy;
+
+    private boolean isRented = false;
+
 
     private double pricePerDay;
 
@@ -62,6 +67,16 @@ public class Car {
         this.pricePerDay = pricePerDay;
     }
 
+    public boolean isRented() {
+        return isRented;
+    }
+
+    public void setRented(boolean rented) {
+        isRented = rented;
+    }
+
+
+
     @Override
     public String toString() {
         return "Car{" +
@@ -70,6 +85,20 @@ public class Car {
                 ", mileage=" + mileage +
                 ", rentedBy=" + rentedBy +
                 ", pricePerDay=" + pricePerDay +
-                '}';
+                ", isRented=" + isRented +
+                '}' + '\n';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return mileage == car.mileage && Double.compare(car.pricePerDay, pricePerDay) == 0 && model.equals(car.model) && type == car.type && Objects.equals(rentedBy, car.rentedBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(model, type, mileage, rentedBy, pricePerDay);
     }
 }

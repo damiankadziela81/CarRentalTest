@@ -4,27 +4,34 @@ import com.carrental.carRepository.Car;
 import com.carrental.customerDataBase.Customer;
 import com.carrental.prepareData.PrepareData;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
-    PrepareData pd = new PrepareData();
-    Scanner scanner = new Scanner(System.in);
-    int userID;
-    int carID;
+    private PrepareData pd = new PrepareData();
+    private Scanner scanner = new Scanner(System.in);
+    private int userID;
+    private int carID;
+    private List<Car> carsAvailableToRent;
+    private List<Car> carsRented;
 
 
 
-    public void displayBranches(){
-
-
+    public void currentStatus(){
+        System.out.println("number of cars: " + pd.getCars().size());
+        System.out.println("number of customers: " + pd.getCustomers().size());
+        carsAvailableToRent = pd.getCars().stream().filter(car -> !car.isRented()).toList();
+        carsRented = pd.getCars().stream().filter(Car::isRented).toList();
+        System.out.println("number of cars available: " + carsAvailableToRent.size());
+        System.out.println("number of cars rented: " + carsRented.size());
+        System.out.println("Cars available: " + carsAvailableToRent);
+        System.out.println("Cars rented: " + carsRented);
     }
 
     public void initialize(){
         pd.fillCarList();
         pd.fillCustomerList();
-
-//        System.out.println(pd.getPilaBranch());
-//        System.out.println(pd.getPoznanBranch());
+        carsAvailableToRent = pd.getCars().stream().filter(car -> car.isRented() == false).toList();
     }
 
     public void displayCars() {
@@ -47,53 +54,132 @@ public class Menu {
 
     }
 
-    public void rent() {
+    public void rentCar() {
         userID = selectUser();
         System.out.println("You selected user: " + userID);
-        carID = selectCar();
+        carID = selectCarForRent();
         System.out.println("You selected car: " + carID);
         //update user with selected car
-        updateCustomer(userID, carID);
-        updateCar(userID, carID);
-
-
+        if(checkIfUserIDisValid(userID) && checkIfCarIDisValid(carID)) {
+            if(pd.getCars().get(carID - 1).isRented()) {
+                System.out.println("Sorry, this car is rented. Pick another one.");
+            } else {
+                updateRentingCustomer(userID, carID);
+                updateRentedCar(userID, carID);
+                System.out.println(pd.getCars().get(carID -1).getModel() + " was rented by "
+                        + pd.getCustomers().get(userID - 1).getName() + " "
+                        + pd.getCustomers().get(userID - 1).getSurName());
+            }
+        } else {
+            System.out.println("Invalid selection!");
+        }
     }
 
-    private void updateCar(int userID, int carID) {
+    public void returnCar() {
+        carID = selectCarToReturn();
+        if(checkIfCarIDisValid(carID)){
+            if(pd.getCars().get(carID - 1).isRented()) {
+                updateReturnedCar(carID);
+                //remove the car from customer List
 
+            } else {
+                System.out.println("This car is not rented.");
+            }
+        } else {
+            System.out.println("Invalid selection");
+        }
     }
 
-    private void updateCustomer(int userID, int carID) {
-        System.out.println(pd.getCustomers().get(userID - 1).getName());
-        System.out.println(pd.getCars().get(carID - 1).getModel());
-
+    private boolean checkIfUserIDisValid(int id) {
+        if(id>0 && id <= pd.getCustomers().size()){
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private int selectCar() {
+    private boolean checkIfCarIDisValid(int id) {
+        if(id>0 && id <= pd.getCars().size()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void updateRentedCar(int userId, int carId) {
+        pd.getCars().get(carId - 1).setRented(true);
+        pd.getCars().get(carId - 1).setMileage(pd.getCars().get(carId - 1).getMileage() + 100);
+        pd.getCars().get(carId - 1).setRentedBy(pd.getCustomers().get(userId -1));
+    }
+
+    private void updateRentingCustomer(int userId, int carId) {
+        pd.getCustomers().get(userId - 1).increaseNumberOfRentals(1);
+        pd.getCustomers().get(userId - 1).increaseMoneySpent(pd.getCars().get(carId - 1).getPricePerDay());
+        pd.getCustomers().get(userId - 1).addCarToCurrentlyRented(pd.getCars().get(carId -1));
+    }
+
+    private void updateReturnedCar(int carId) {
+        pd.getCars().get(carID - 1).setRented(false);
+        pd.getCars().get(carID - 1).setRentedBy(null);
+    }
+
+    private int selectCarForRent() {
         int i = 0;
         int result = 0;
-        System.out.println("Pick your car: ");
-        for(Car car: pd.getCars()){
-            i++;
-            System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPricePerDay());
-        }
-
-        try {
-            result = scanner.nextInt();
-        } catch (Exception e) {
-            System.out.println("Please select valid car! [1 - " + i + "]");
-        }
-
-        if(result < 1 || result > i) {
-            System.out.println("Please select valid car! [1 - " + i + "]");
-            return 0;
+        if (checkIfThereAreCarsForRent(pd.getCars())){
+            System.out.println("Pick your car: ");
+            for(Car car: pd.getCars()){
+                i++;
+                if(!car.isRented()){
+                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPricePerDay() + " available: " + !car.isRented());
+                }
+            }
+            try {
+                result = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please select valid car! [1 - " + i + "]");
+            }
+            if(result < 1 || result > i) {
+                System.out.println("Please select valid car! [1 - " + i + "]");
+                return 0;
+            } else {
+                return result;
+            }
         } else {
-            return result;
+            System.out.println("There are no cars available to rent.");
+            return 0;
+        }
+    }
+
+    private int selectCarToReturn(){
+        int i = 0;
+        int result = 0;
+        if(checkIfThereAreCarsToReturn(pd.getCars())){
+            System.out.println("Pick your car: ");
+            for(Car car: pd.getCars()){
+                i++;
+                if(car.isRented()){
+                    System.out.println("[" + i + "]" + car.getModel() + " " + car.getType() + " price: " + car.getPricePerDay() + " available: " + !car.isRented());
+                }
+            }
+            try {
+                result = scanner.nextInt();
+            } catch (Exception e) {
+                System.out.println("Please select valid car! [1 - " + i + "]");
+            }
+            if(result < 1 || result > i) {
+                System.out.println("Please select valid car! [1 - " + i + "]");
+                return 0;
+            } else {
+                return result;
+            }
+        } else {
+            System.out.println("There are no cars available to return.");
+            return 0;
         }
     }
 
     private int selectUser(){
-
         int i = 0;
         int result = 0;
         System.out.println("Select user: ");
@@ -101,22 +187,30 @@ public class Menu {
             i++;
             System.out.println("[" + i + "]" + customer.getName() + " " + customer.getSurName());
         }
+        try {
+            result = scanner.nextInt();
+        } catch (Exception e) {
+            System.out.println("Please select valid user! [1 - " + i + "]");
+        }
+        if(result < 1 || result > i) {
+            System.out.println("Please select valid user! [1 - " + i + "]");
+            return 0;
+        } else {
+            return result;
+        }
+    }
 
-//        while(userID < 1 || userID > i){
-            try {
-                result = scanner.nextInt();
-            } catch (Exception e) {
-                System.out.println("Please select valid user! [1 - " + i + "]");
-//                break;
-            }
-            if(result < 1 || result > i) {
-                System.out.println("Please select valid user! [1 - " + i + "]");
-                return 0;
-            } else {
-                return result;
-            }
+    private boolean checkIfThereAreCarsForRent(List<Car> cars){
+        for(Car c : cars){
+            if (!c.isRented()) return true;
+        }
+        return false;
+    }
 
-//        }
-//        return userID;
+    private boolean checkIfThereAreCarsToReturn(List<Car> cars){
+        for(Car c : cars) {
+            if (c.isRented()) return true;
+        }
+        return false;
     }
 }

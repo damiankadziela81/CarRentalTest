@@ -9,8 +9,8 @@ import java.util.List;
 
 public class PrepareData {
 
-    List<Car> cars = new ArrayList<>();
-    List<Customer> customers = new ArrayList<>();
+    private List<Car> cars = new ArrayList<>();
+    private List<Customer> customers = new ArrayList<>();
 
     public void fillCarList(){
         cars.add(new Car("Audi",CarType.SEDAN,0,null, 100.0));
@@ -25,20 +25,6 @@ public class PrepareData {
         customers.add(new Customer("Agnieszka", "Burak"));
         customers.add(new Customer("Stefan", "Cebula"));
     }
-
-
-
-//    public String getBranchNames(){
-//        StringBuilder sb = new StringBuilder();
-//        int i = 0;
-//        for(CarRentalBranch crb: carRentalBranches) {
-//            i++;
-//            sb.append("[" + i + "] " + crb.getName()+"\n");
-//        }
-//        return sb.toString();
-//    }
-
-
 
     public List<Car> getCars(){
         return cars;
